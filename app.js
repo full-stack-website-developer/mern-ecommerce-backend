@@ -28,6 +28,10 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Mongo sanitize (Express 5–safe: only body & params, does not touch req.query)
 app.use(security.mongoSanitize);
 
+app.get('/', (req, res, next) => {
+  res.json({message: 'I am live now ;)'})
+})
+
 // Routes
 app.use('/api/auth', routes);
 

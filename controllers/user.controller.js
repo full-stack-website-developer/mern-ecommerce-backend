@@ -9,6 +9,15 @@ class UserController {
         return ApiResponse.success(res, result, 'Registration successful', 201);
     });
 
+    index = asyncHandler(async (req, res)  => {
+        console.log('here2');
+        const data = {
+            'live': 'its live now' 
+        };
+
+        return ApiResponse.success(res, data, 'Registration successful', 200);
+    });
+
     login = asyncHandler(async (req, res)  => {
         const { email, password } = req.body;
         const result = await userService.login(email, password);
