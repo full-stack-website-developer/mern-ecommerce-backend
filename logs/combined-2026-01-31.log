@@ -78,3 +78,21 @@
 {"level":"info","message":"Server running in development mode on port 3002","timestamp":"2026-01-31 14:21:49"}
 {"level":"info","message":"MongoDB Connected: ac-zqp0oxe-shard-00-00.iqi88j4.mongodb.net","timestamp":"2026-01-31 14:21:50"}
 {"level":"warn","message":"MongoDB disconnected","timestamp":"2026-01-31 14:22:02"}
+{"level":"info","message":"Server running in development mode on port 3002","timestamp":"2026-01-31 15:36:34"}
+{"level":"info","message":"MongoDB Connected: ac-zqp0oxe-shard-00-01.iqi88j4.mongodb.net","timestamp":"2026-01-31 15:36:36"}
+{"level":"error","message":"invalid_request","method":"POST","stack":"Error: invalid_request\n    at Gaxios._request (/home/talha/Documents/New Learning/react/ecommerce/backend/node_modules/gaxios/build/cjs/src/gaxios.js:155:23)\n    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)\n    at async OAuth2Client.getTokenAsync (/home/talha/Documents/New Learning/react/ecommerce/backend/node_modules/google-auth-library/build/src/auth/oauth2client.js:205:21)\n    at async UserService.googleLogin (file:///home/talha/Documents/New%20Learning/react/ecommerce/backend/services/user.service.js:116:32)\n    at async file:///home/talha/Documents/New%20Learning/react/ecommerce/backend/controllers/user.controller.js:59:24","timestamp":"2026-01-31 15:41:42","url":"/api/auth/google/4%2F0ASc3gC0iC6743VBhoOIHUqSf5yhdk1_-FXFAEE9fxl_EpkvX1AOkmo6AdQKMBCcI33hfCA"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2026-01-31 15:46:44"}
+{"level":"info","message":"Server running in development mode on port 3002","timestamp":"2026-01-31 15:47:34"}
+{"level":"info","message":"MongoDB Connected: ac-zqp0oxe-shard-00-02.iqi88j4.mongodb.net","timestamp":"2026-01-31 15:47:35"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2026-01-31 15:47:45"}
+{"level":"info","message":"Server running in development mode on port 3002","timestamp":"2026-01-31 15:47:51"}
+{"level":"info","message":"MongoDB Connected: ac-zqp0oxe-shard-00-02.iqi88j4.mongodb.net","timestamp":"2026-01-31 15:47:52"}
+{"level":"error","message":"connect ECONNREFUSED 127.0.0.1:587","method":"POST","stack":"Error: connect ECONNREFUSED 127.0.0.1:587\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)","timestamp":"2026-01-31 15:49:49","url":"/api/auth/forgot-password"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2026-01-31 16:21:46"}
+{"level":"info","message":"Server running in development mode on port 3002","timestamp":"2026-01-31 16:45:30"}
+{"level":"info","message":"MongoDB Connected: ac-zqp0oxe-shard-00-01.iqi88j4.mongodb.net","timestamp":"2026-01-31 16:45:31"}
+{"level":"error","message":"connect ECONNREFUSED 127.0.0.1:587","method":"POST","stack":"Error: connect ECONNREFUSED 127.0.0.1:587\n    at TCPConnectWrap.afterConnect [as oncomplete] (node:net:1637:16)","timestamp":"2026-01-31 16:53:29","url":"/api/auth/forgot-password"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2026-01-31 16:54:04"}
+{"level":"info","message":"Server running in development mode on port 3002","timestamp":"2026-01-31 16:54:08"}
+{"level":"info","message":"MongoDB Connected: ac-zqp0oxe-shard-00-00.iqi88j4.mongodb.net","timestamp":"2026-01-31 16:54:09"}
+{"level":"warn","message":"MongoDB disconnected","timestamp":"2026-01-31 17:08:28"}
