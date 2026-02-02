@@ -1,144 +1,127 @@
-import bcrypt from 'bcryptjs';
+import { AddressResponseDto } from "../dtos/address.dto.js";
 import { UserResponseDto } from "../dtos/user.dto.js";
+import addressRepository from "../repositories/address.repository.js";
 import userRepository from "../repositories/user.repository.js";
-import { generateToken } from "../utils/jwt.util.js";
 import { AppError } from "../utils/errors.util.js";
-import { sendOtpMail } from '../email/send-otp-mail.js';
-import axios from 'axios';
-import { oauth2client } from '../config/google.config.js';
+import bcrypt from 'bcryptjs';
+import { upload, cloudinary } from '../config/cloudinary.js';
 
 class UserService {
-    async register(userData) {
-        const existingUser = await userRepository.findByEmail(userData.email);
-        if (existingUser) {
-            throw new AppError('Email Already Registered', 409);
-        }
-
-        const user = await userRepository.create(userData);
-
-        const token = generateToken(user._id);
-
-        return{
-            user: UserResponseDto.fromUser(user),
-            token,
-        };
-    }
-    
-    async login (email, password) {
-        const user = await userRepository.findByEmail(email);
+    async getUser(id) {
+        const user = await userRepository.findById(id, { withAddresses: true });
         if (!user) {
-            throw new AppError('Invalid Credentials', 401);
+            throw new AppError('User Not Found!', 404);
         }
-
-        const isPasswordValid = await bcrypt.compare(password, user.password);
-        if (!isPasswordValid) {
-            throw new AppError('Invalid Credentials', 401);
-        }
-
-        const token = generateToken(user._id);
 
         return {
             user: UserResponseDto.fromUser(user),
-            token,
-        };
+        }
     }
 
-    async forgotPassword(email) {
-        const user = await userRepository.findByEmail(email);
+    async editInfo(id, newData) {
+        let user = await userRepository.findById(id);
         if (!user) {
-            throw new AppError('User Not Found', 404);
-        };
-
-        const otp = Math.floor(100000 + Math.random() * 900000).toString();
-        const expiry = new Date(Date.now() + 10 * 60 * 1000);
+            throw new AppError('User Not Found!', 404);
+        }
         
-        user.otp = otp;
-        user.otpExpiry = expiry;
-
-        console.log(user);
-            
-        await userRepository.save(user);
-        await sendOtpMail(email, otp);
+        const updatedUser = await userRepository.update(id, newData);
+        if (!updatedUser) {
+            throw new AppError('Error While Updating User', 505);
+        }
 
         return {
-            user: UserResponseDto.fromUser(user),
-        }
+            user: UserResponseDto.fromUser(updatedUser),
+        };
     }
 
-    async verifyOTP(email, otp) {
-        if (!otp) {
-            throw new AppError('OTP is Required!', 400);
-        }
+    async updateAddress(id, address) {
+        let existingAddress = await addressRepository.findById(id);
+        if (!existingAddress) {
+            throw new AppError('Address Not Found!', 404);
+        } 
+        
+        const updatedAddress = await addressRepository.update(id, address);
 
-        const user = await userRepository.findByEmail(email);
-        if (!user) {
-            throw new AppError('User Not Found', 404);
-        }
-
-        if (!user.otp || !user.otpExpiry) {
-            throw new AppError('OTP not generated or Already Verified', 400);
-        }
-
-        if (user.otpExpiry < new Date()) {
-            throw new AppError('OTP has Expired. Please request new one', 400);
-        }
-
-        if (user.otp !== otp) {
-            throw new AppError('Invalid OTP!', 400);
-        }
-
-        user.otp = null;
-        user.otpExpiry = null;
-
-        await userRepository.save(user);
+        return {
+            address: AddressResponseDto.fromAddress(updatedAddress),
+        };
     }
 
-    async changePassword(newPassword, confirmPassword, email) {
-        if (!newPassword || !confirmPassword) {
-            throw new AppError('All Fields are Required!', 400);
-        }
+    async getAddress(userId) {
+        const address = await addressRepository.findByUserId(userId);
+        return address || null;
+    }
 
-        if (newPassword !== confirmPassword) {
-            throw new AppError('Password do not match', 400);
+    async createAddress(userId, newAddress) {
+        let existingAddress = await addressRepository.findByUserId(userId);
+        if (existingAddress) {
+            throw new AppError('Address Already Exists!', 409);
         }
+        const address = await addressRepository.create({ userId, ...newAddress });
 
-        const user = await userRepository.findByEmail(email);
+        return {
+            address: AddressResponseDto.fromAddress(address),
+        };
+    }
+
+    async changePassword(id, data) {
+        const { currentPassword, newPassword } = data;
+
+        let user = await userRepository.findById(id, { withPassword: true });
         if (!user) {
-            throw new AppError('User Not Found', 404);
+            throw new AppError('User Not Found!', 404);
+        } 
+        
+        const matched = await bcrypt.compare(currentPassword, user.password);
+
+        if (!matched) {
+            throw new AppError('Password is Incorrect', 401);
         }
 
         user.password = newPassword;
-        
-        await userRepository.save(user);
+        const updatedUser = await userRepository.save(user);
+
+        return {
+            user: UserResponseDto.fromUser(updatedUser),
+        };
     }
 
-    async googleLogin(code) {
-        const googleResponse = await oauth2client.getToken(code);
-        oauth2client.setCredentials(googleResponse);
-
-        const googleRes = await axios.get(
-            `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${googleResponse.tokens.access_token}`
-        )
-        
-        let user = await userRepository.findByEmail(googleRes.data.email);
-        if (!user) {
-            const newGoogleLoginUser = {
-                firstName: googleRes.data.given_name,
-                lastName: googleRes.data.family_name,
-                email: googleRes.data.email,
-                googleId: googleRes.data.id,
-                password: null, 
-                phone: null  
-            }
-            user = await userRepository.create(newGoogleLoginUser);
+    async updateAvatar(userId, file) {
+        if (!file) {
+            throw AppError('Please upload an Image', 400);
         }
 
-        const token = generateToken(user._id);
+        const user = await userRepository.findById(userId);
 
-        return{
-            user: UserResponseDto.fromUser(user),
-            token,
+        if (user.avatar.publicId) {
+            await cloudinary.uploader.destroy(user.avatar.publicId);
+        }
+
+        user.avatar = {
+            url: file.path, // Cloudinary URL
+            publicId: file.filename // Cloudinary public ID
         };
+
+        // Update user's profile image in database
+        const updatedUser = await userRepository.save(user);
+
+        return {
+            user: UserResponseDto.fromUser(updatedUser),
+        };
+    }
+
+    async createPassword(userId, password) {
+        let user = await userRepository.findById(userId);
+        if (!user) {
+            throw new AppError('User Not Exists!', 404);
+        }
+
+        if (user.password) {
+            throw new AppError('Password Already Exists!', 409);
+        }
+
+        user.password = password;
+        await userRepository.save(user);
     }
 }
 

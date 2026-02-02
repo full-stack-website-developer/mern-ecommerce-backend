@@ -3,12 +3,17 @@ import express from 'express';
 import cors from 'cors';
 import security from './middleware/security.middleware.js';
 import config from './config/app.config.js';
-import routes from './routes/user.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import userRoutes from './routes/user.routes.js';
 import errorHandler from './middleware/error-handler.middleware.js';
 import { AppError } from './utils/errors.util.js';
+import path, { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
 const app = express();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 // Security
 app.use(security.helmet);
 app.use(security.xss);
@@ -28,12 +33,11 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 // Mongo sanitize (Express 5–safe: only body & params, does not touch req.query)
 app.use(security.mongoSanitize);
 
-app.get('/', (req, res, next) => {
-  res.json({message: 'I am live now ;)'})
-})
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
-app.use('/api/auth', routes);
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // Health check
 app.get('/health', (req, res) => {

@@ -1,20 +1,18 @@
 import express from 'express';
-
-import userController from '../controllers/user.controller.js';
-import { validate } from '../middleware/validation.middleware.js';
-import { registerSchema, loginSchema } from '../validators/user.validator.js';
 import { authenticateToken } from '../middleware/auth.middleware.js';
+import UserController from '../controllers/user.controller.js';
+import { upload } from '../config/cloudinary.js';
 
 const userRouter = express.Router();
+// Store files in memory or disk
 
-userRouter.get('/', userController.index);
-userRouter.post('/register', validate(registerSchema), userController.register);
-userRouter.post('/login',  validate(loginSchema), userController.login);
-// userRouter.get('/users', authMiddleware.authenticateToken, userController.getUsers);
-userRouter.get('/verify-token', authenticateToken, userController.verifyToken)
-userRouter.post('/forgot-password', userController.forgotPassword);
-userRouter.post('/verify-otp/:email', userController.verifyOTP);
-userRouter.post('/change-password/:email', userController.changePassword);
-userRouter.post('/google/:code', userController.googleLogin);
+userRouter.get('/me', authenticateToken, UserController.getMe);
+userRouter.patch('/me/personal-info', authenticateToken, UserController.updatePersonalInfo);
+userRouter.patch('/me/address/:id', authenticateToken, UserController.updateAddress);
+userRouter.get('/me/address', authenticateToken, UserController.getAddress);
+userRouter.post('/me/address', authenticateToken, UserController.createAddress);
+userRouter.patch('/me/password', authenticateToken, UserController.changePassword);
+userRouter.post('/me/password', authenticateToken, UserController.createPassword);
+userRouter.patch('/me/avatar', authenticateToken, upload.single('avatar'), UserController.updateAvatar);
 
 export default userRouter;

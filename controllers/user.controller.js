@@ -1,66 +1,71 @@
-import userService from '../services/user.service.js';
-import { asyncHandler } from '../utils/async-handler.util.js';
-import ApiResponse from '../utils/response.util.js';
+import { asyncHandler } from "../utils/async-handler.util.js";
+import userService from "../services/user.service.js";
+import ApiResponse from "../utils/response.util.js";
 
-class UserController {
-    register = asyncHandler(async (req, res)  => {
-        const result = await userService.register(req.body);
+class UserController{
+    getMe = asyncHandler(async (req, res) => {
+        const userId = req.user.id;
+        const user = await userService.getUser(userId);
+        
+        return ApiResponse.success(res, user, 'User Found Successfully', 200)
+    })
 
-        return ApiResponse.success(res, result, 'Registration successful', 201);
-    });
+    updatePersonalInfo = asyncHandler(async (req, res) => {
+        const userId = req.user.id;
+        const data = await userService.editInfo(userId, req.body);
 
-    index = asyncHandler(async (req, res)  => {
-        console.log('here2');
-        const data = {
-            'live': 'its live now' 
-        };
+        return ApiResponse.success(res, data, 'User Updated Successfully', 200);
+    })
 
-        return ApiResponse.success(res, data, 'Registration successful', 200);
-    });
+    updateAddress = asyncHandler(async (req, res) => {
+        const id = req.params.id;
+        const address = await userService.updateAddress(id, req.body);
 
-    login = asyncHandler(async (req, res)  => {
-        const { email, password } = req.body;
-        const result = await userService.login(email, password);
+        return ApiResponse.success(res, address, 'Address Updated Successfully', 200);
+    })
 
-        return ApiResponse.success(res, result, 'login successful', 201);
-    });
+    getAddress = asyncHandler(async (req, res) => {
+        const userId = req.user.id;
+        const address = await userService.getAddress(userId);
 
-    verifyToken = asyncHandler(async (req, res)  => {
-        return ApiResponse.success(res, {user: req.user}, 'Token Verified successful', 200);
-    });
+        if (!address) {
+            return ApiResponse.success(res, null, 'No Address Found', 200);
+        }
 
-    forgotPassword = asyncHandler(async (req, res) => {
-        const { email } = req.body;
-        const result = await userService.forgotPassword(email);
+        return ApiResponse.success(res, address, 'User Updated Successfully', 200);
+    })
 
-        return ApiResponse.success(res, result, 'OTP sent successfully', 200);
-    });
+    createAddress = asyncHandler(async (req, res) => {
+        const userId = req.user.id;
+        
+        const data = await userService.createAddress(userId, req.body);
 
-    verifyOTP = asyncHandler(async (req, res) => {
-        const { otp } = req.body;
-        const email = req.params.email;
-
-        await userService.verifyOTP(email, otp);
-
-        return ApiResponse.success(res, null, 'OTP Verified successfully', 200);
-    });
+        return ApiResponse.success(res, data, 'Address Created Successfully', 200);
+    })
 
     changePassword = asyncHandler(async (req, res) => {
-        const { password, confirmPassword } = req.body;
-        const email = req.params.email;
+        const userId = req.user.id;
+        const user = await userService.changePassword(userId, req.body);
 
-        await userService.changePassword(password, confirmPassword, email);
+        return ApiResponse.success(res, user, 'Password Updated Successfully', 200);
+    })
 
-        return ApiResponse.success(res, null, 'Password Changes Successfully', 200);
-    });
+    updateAvatar = asyncHandler(async (req, res) => {
+        const file = req.file;
+        const userId = req.user.id;
 
-    googleLogin = asyncHandler(async (req, res) => {
-        const code  = req.params.code;
-        const result = await userService.googleLogin(code);
+        const user = await userService.updateAvatar(userId, file)
 
-        return ApiResponse.success(res, result, 'Logged In Successfully', 200);
-    });
+        return ApiResponse.success(res, user, 'User Profile Image Updated Successfully', 200);
+    })
+
+    createPassword = asyncHandler(async (req, res) => {
+        const userId = req.user.id;
+        
+        await userService.createPassword(userId, req.body.newPassword);
+
+        return ApiResponse.success(res, null, 'Password Created Successfully', 200);
+    })
 }
-
 
 export default new UserController();
