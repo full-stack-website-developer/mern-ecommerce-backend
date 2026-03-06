@@ -8,7 +8,7 @@ import { authenticateToken } from '../middleware/auth.middleware.js';
 const authRouter = express.Router();
 
 authRouter.post('/register', validate(registerSchema), authController.register);
-authRouter.post('/login',  validate(loginSchema), authController.login);
+authRouter.post('/login',  authController.login);
 authRouter.get('/verify-token', authenticateToken, authController.verifyToken)
 authRouter.post('/forgot-password', authController.forgotPassword);
 authRouter.post('/verify-otp/:email', authController.verifyOTP);

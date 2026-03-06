@@ -14,6 +14,11 @@ class SellerController {
         
         return ApiResponse.success(res, sellers, 'All Sellers Fetched Successfully', 200);
     })
+
+    getPublicStoreBySlug = asyncHandler(async (req, res) => {
+        const data = await sellerService.getPublicStoreBySlug(req.params.sellerSlug);
+        return ApiResponse.success(res, data, 'Store fetched successfully', 200);
+    })
 }
 
 export default new SellerController();

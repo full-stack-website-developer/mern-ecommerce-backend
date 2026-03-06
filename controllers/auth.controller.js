@@ -2,18 +2,18 @@ import authService from '../services/auth.service.js';
 import { asyncHandler } from '../utils/async-handler.util.js';
 import ApiResponse from '../utils/response.util.js';
 
-class authController {
+class AuthController {
     register = asyncHandler(async (req, res)  => {
         const result = await authService.register(req.body);
 
-        return ApiResponse.success(res, result, 'Registration successful', 201);
+        return ApiResponse.success(res, result, 'Registration successful', 200);
     });
 
     login = asyncHandler(async (req, res)  => {
         const { email, password } = req.body;
         const result = await authService.login(email, password);
 
-        return ApiResponse.success(res, result, 'login successful', 201);
+        return ApiResponse.success(res, result, 'login successful', 200);
     });
 
     verifyToken = asyncHandler(async (req, res)  => {
@@ -54,4 +54,4 @@ class authController {
 }
 
 
-export default new authController();
+export default new AuthController();

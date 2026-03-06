@@ -57,14 +57,14 @@ const productSchema = mongoose.Schema({
 
     price: {
         type: Number,
-        required: true,
         min: 0,
+        default: 0,
     },
 
     quantity: {
         type: Number,
-        required: true,
         min: 0,
+        default: 0,
     },
 
     options: [
@@ -96,6 +96,7 @@ const productSchema = mongoose.Schema({
     sellerId: {
         type: Schema.Types.ObjectId,
         ref: 'Seller',
+        default: null,
     },
     
     categoryId: {
@@ -114,9 +115,39 @@ const productSchema = mongoose.Schema({
         enum: ['enabled', 'disabled'],
         default: 'enabled',
         required: true,
-    }
+    },
+
+    hasVariants: {
+        type: Boolean,
+        default: false,
+    },
+
+    flashSale: {
+        isActive: {
+            type: Boolean,
+            default: false,
+        },
+        salePrice: {
+            type: Number,
+            default: null,
+        },
+        startAt: {
+            type: Date,
+            default: null,
+        },
+        endAt: {
+            type: Date,
+            default: null,
+        },
+    },
 
 }, { timestamps: true });
+
+productSchema.index({ categoryId: 1, status: 1 });
+productSchema.index({ sellerId: 1, status: 1 });
+productSchema.index({ tags: 1 });
+productSchema.index({ price: 1, discount: 1 });
+productSchema.index({ name: "text", shortDescription: "text", tags: "text" });
 
 productSchema.virtual('inStock').get(function() {
     return this.quantity > 0;

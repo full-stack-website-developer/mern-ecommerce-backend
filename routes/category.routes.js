@@ -23,8 +23,6 @@ categoryRouter.put(
 
 categoryRouter.get(
     '/', 
-    authenticateToken,
-    authorize('admin'),
     categoryController.getCategories
 );
 

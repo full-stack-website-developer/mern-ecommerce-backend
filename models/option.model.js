@@ -21,36 +21,36 @@ const optionSchema = new Schema({
             // Examples: 'Red', 'Blue', 'Small', 'Large'
         },
 
-        price: {
-            type: Number,
-            required: true,
-            min: 0,
-        },
+        // price: {
+        //     type: Number,
+        //     required: true,
+        //     min: 0,
+        // },
 
-        quantity: {
-            type: Number,
-            required: true,
-            min: 0,
-        },
+        // quantity: {
+        //     type: Number,
+        //     required: true,
+        //     min: 0,
+        // },
 
-        // For color hex codes, image URLs, etc.
-        metadata: {
-            type: Schema.Types.Mixed,
-            default: null,
-            // Examples: { hex: '#FF0000' }, { image: 'url' }
-        },
+        // // For color hex codes, image URLs, etc.
+        // metadata: {
+        //     type: Schema.Types.Mixed,
+        //     default: null,
+        //     // Examples: { hex: '#FF0000' }, { image: 'url' }
+        // },
         enabled: {
             type: Boolean,
             default: true,
         }
     }],
 
-    // Display type for UI
-    displayType: {
-        type: String,
-        enum: ['dropdown', 'color-swatch', 'button', 'image'],
-        default: 'dropdown',
-    },
+    // // Display type for UI
+    // displayType: {
+    //     type: String,
+    //     enum: ['dropdown', 'color-swatch', 'button', 'image'],
+    //     default: 'dropdown',
+    // },
 
     // Order for display
     position: {

@@ -13,6 +13,12 @@ class AddressRepository {
         return await Address.findOne({ userId });
     }
 
+    async findAllByUserId(userId, type=null) {
+        const filter = { userId };
+        if (type) filter.type = type;
+        return await Address.find(filter).sort({ createdAt: -1 }); 
+    }
+
     async save(address) {
         return await address.create();
     }

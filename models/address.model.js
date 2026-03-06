@@ -10,9 +10,13 @@ const AddressSchema = mongoose.Schema({
 
     type: {
       type: String,
-      enum: ['home', 'shop'],
+      enum: ['home', 'shop', 'shipping'],
       default: 'home',
     },
+
+    firstName: String,
+    lastName: String,
+    phone: String,
 
     country: {
       type: String,

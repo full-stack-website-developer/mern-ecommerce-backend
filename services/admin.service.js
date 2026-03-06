@@ -22,6 +22,10 @@ class AdminService {
             status: seller.status,
         };
     }
+
+    async listUsers({ page = 1, limit = 10, role, status, search } = {}) {
+        return userRepository.listWithFilters({ page, limit, role, status, search });
+    }
 }
 
 export default new AdminService();

@@ -2,6 +2,8 @@ import { verifyToken } from '../utils/jwt.util.js';
 import { UnauthorizedError } from '../utils/errors.util.js';
 import { asyncHandler } from '../utils/async-handler.util.js';
 import userRepository from '../repositories/user.repository.js';
+import { optionalAuth } from './optionalAuth.middleware.js';
+import sellerRepository from '../repositories/seller.repository.js';
 
 const authenticateToken = asyncHandler(async (req, res, next) => {
     // Extract token
@@ -34,6 +36,15 @@ const authenticateToken = asyncHandler(async (req, res, next) => {
         role: user.role
     };
 
+    if (user.role === 'seller') {
+        const seller = await sellerRepository.getByUserId(user._id);
+        if (!seller) {
+            throw new UnauthorizedError('Seller profile not found');
+        }
+        req.user.sellerId = seller._id;
+        req.user.sellerStatus = seller.status;
+    }
+
     next();
 });
 
@@ -46,4 +57,12 @@ const authorize = (...roles) => {
     };
 };
 
-export { authorize, authenticateToken };
+const requireApprovedSeller = (req, _res, next) => {
+    if (req.user?.role !== 'seller') return next();
+    if (req.user?.sellerStatus !== 'approved') {
+        throw new UnauthorizedError('Seller account is not approved');
+    }
+    next();
+};
+
+export { authorize, authenticateToken, optionalAuth, requireApprovedSeller };

@@ -1,24 +1,30 @@
 import Category from '../models/category.model.js';
 
 class CategoryRepository {
-    async findParentByNameOrSlug(name, slug) {
-        return Category.findOne({ 
-            parseInt: null,
+    async findParentByNameOrSlug(name, slug, excludeId = null) {
+        const query = {
+            parentId: null,
             $or: [
                 { name: new RegExp(`^${name}$`, 'i') },
                 { slug: slug.toLowerCase().trim() }
             ]
-        });
+        };
+
+        if (excludeId) query._id = { $ne: excludeId };
+        return Category.findOne(query);
     }
 
-    async findChildByNameOrSlug({ parentId, name, slug }) {
-        return Category.findOne({
+    async findChildByNameOrSlug({ parentId, name, slug, excludeId = null }) {
+        const query = {
             parentId,
             $or: [
                 { name: new RegExp(`^${name}$`, 'i') },
                 { slug: slug.toLowerCase().trim() }
             ]
-        })
+        };
+
+        if (excludeId) query._id = { $ne: excludeId };
+        return Category.findOne(query);
     }
 
     async findById(id) {
@@ -60,6 +66,10 @@ class CategoryRepository {
 
     async deleteById(id) {
         return Category.findByIdAndDelete(id);
+    }
+
+    async countChildren(parentId) {
+        return Category.countDocuments({ parentId });
     }
 }
 

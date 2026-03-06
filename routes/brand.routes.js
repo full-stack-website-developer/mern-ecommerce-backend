@@ -24,7 +24,7 @@ brandRouter.put(
 brandRouter.get(
     '/', 
     authenticateToken, 
-    authorize('admin'),
+    // authorize('admin'),
     brandController.getBrands
 );
 

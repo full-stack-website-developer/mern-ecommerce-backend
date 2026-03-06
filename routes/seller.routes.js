@@ -6,6 +6,11 @@ import { combineUploads } from "../utils/upload.until.js";
 const sellerRouter = express.Router();
 
 sellerRouter.get(
+    '/store/:sellerSlug',
+    sellerController.getPublicStoreBySlug
+);
+
+sellerRouter.get(
     '/all', 
     authenticateToken,
     sellerController.getSellers,
